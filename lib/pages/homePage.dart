@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:money_exchange_app/api/clientApi.dart';
 import 'package:money_exchange_app/model/MoneyExchangeModel.dart';
+import 'package:money_exchange_app/util/sharedpref.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,13 +13,33 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   ClientApi _clientApi = ClientApi();
 
-  List<MoneyExchangeModel> myList = [];
   List<DataList> mdataList = [];
   late Future<MoneyExchangeModel?> _future;
+  SharedPref sharedPref = SharedPref();
+  Rates userSave = Rates();
+  Rates userLoad = Rates();
+
+/*loadSharedPrefs() async {
+    try {
+      var mData = await sharedPref.read("myList") ;
+      Rates user = Rates.fromJson(mData);
+      Scaffold.of(context).showSnackBar(SnackBar(
+          content: new Text("Loaded!"),
+          duration: const Duration(milliseconds: 500)));
+      setState(() {
+        userLoad = user;
+      });
+    } catch (Excepetion) {
+      Scaffold.of(context).showSnackBar(SnackBar(
+          content: new Text("Nothing found!"),
+          duration: const Duration(milliseconds: 500)));
+    }}*/
+
 
   @override
-  void initState() {
+   initState() {
     _future = _clientApi.getSingleObjectData();
+
     super.initState();
   }
 
@@ -33,6 +54,7 @@ class _HomePageState extends State<HomePage> {
               child: Icon(
                 Icons.refresh,
                 color: Colors.white,
+                textDirection: TextDirection.ltr,
               ),
               onPressed: () {
                 setState(() {
@@ -52,7 +74,6 @@ class _HomePageState extends State<HomePage> {
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
                         return Text("there is no connection");
-
                       case ConnectionState.active:
                       case ConnectionState.waiting:
                         return Center(child: new CircularProgressIndicator());
@@ -62,9 +83,16 @@ class _HomePageState extends State<HomePage> {
                           mdataList.clear();
                           var mList = snapshot.data.rates.toJson();
 
+                          print(mList);
                           for (var prop in mList.entries) {
                             mdataList.add(DataList(prop.key, prop.value));
+                            print(mdataList.toString());
                           }
+                       /*   sharedPref.save("myList", mdataList);
+
+
+                          print(loadSharedPrefs());*/
+                          //loadSharedPrefs();
                           return ListView.builder(
                               shrinkWrap: true,
                               itemCount: mdataList.length,
