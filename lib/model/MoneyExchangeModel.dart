@@ -416,7 +416,7 @@ class Rates {
     eGP = json['EGP'];
     eRN = json['ERN'];
     eTB = json['ETB'];
-    eUR = json['EUR'] == null ? 0.0 : json['EUR'].toDouble();
+    eUR = json['EUR'] == null ? 0 : json['EUR'];
     fJD = json['FJD'];
     fKP = json['FKP'];
     gBP = json['GBP'];
