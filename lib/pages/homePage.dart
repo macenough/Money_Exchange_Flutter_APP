@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
                           var mList = snapshot.data.rates.toJson();
 
                           for (var prop in mList.entries) {
-                            mdataList.add(DataList(prop.key, prop.value));
+                            mdataList.add(DataList(prop.key, prop.value.toString()));
                           }
                           return ListView.builder(
                               shrinkWrap: true,
@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage> {
 
 class DataList {
   String? currentType;
-  double? rate;
+  String? rate;
 
   DataList(this.currentType, this.rate);
 }
