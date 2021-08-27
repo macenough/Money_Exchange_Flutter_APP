@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:money_exchange_app/pages/homePage.dart';
 
-void main() {
+import 'database/DatabaseCreator.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await DatabaseCreator().initDatabase();
   runApp(MyApp());
 }
 

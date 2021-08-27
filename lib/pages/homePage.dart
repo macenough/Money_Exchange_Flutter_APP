@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:money_exchange_app/api/clientApi.dart';
+import 'package:money_exchange_app/database/quotes_repository.dart';
 import 'package:money_exchange_app/model/MoneyExchangeModel.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,12 +17,33 @@ class _HomePageState extends State<HomePage> {
 
   List<MoneyExchangeModel> myList = [];
   List<DataList> mdataList = [];
+  List<DataList> mLocalList = [];
   late Future<MoneyExchangeModel?> _future;
+  Repository _repository = Repository();
+  late LocalDbList ldb = LocalDbList(0, "");
 
   @override
   void initState() {
+     getLocalData();
+
     _future = _clientApi.getSingleObjectData();
     super.initState();
+  }
+
+  Future<void> getLocalData() async {
+      Repository.getAllData().then((value) => {
+        ldb = value!
+    });
+
+    final String? savedEntriesJson = ldb.data;
+    final List<dynamic> entriesDeserialized = json.decode(savedEntriesJson!);
+    List<DataList> deserializedEntries =
+        entriesDeserialized.map((json) => DataList.fromJson(json)).toList();
+
+    // table mathi data get
+    setState(() {
+      mLocalList = deserializedEntries;
+    });
   }
 
   @override
@@ -63,8 +87,19 @@ class _HomePageState extends State<HomePage> {
                           var mList = snapshot.data.rates.toJson();
 
                           for (var prop in mList.entries) {
-                            mdataList.add(DataList(prop.key, prop.value));
+                            mdataList
+                                .add(DataList(prop.key, prop.value.toString()));
                           }
+                          List<DataList> entries = mdataList;
+                          String entriesJson = json.encode(
+                              entries.map((entry) => entry.toJson()).toList());
+
+                          LocalDbList localDb = new LocalDbList(1, entriesJson);
+                          _repository.addList(localDb).then((value) => {
+                            print("=-=-=-=-=-=-=-=-"),
+                            print(value)
+                          });
+
                           return ListView.builder(
                               shrinkWrap: true,
                               itemCount: mdataList.length,
@@ -113,7 +148,45 @@ class _HomePageState extends State<HomePage> {
 
 class DataList {
   String? currentType;
-  double? rate;
+  String? rate;
 
   DataList(this.currentType, this.rate);
+
+  DataList.fromJson(Map<String, dynamic> json) {
+    currentType = json['currentType'];
+    rate = json['rate'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['currentType'] = this.currentType;
+    data['rate'] = this.rate;
+
+    return data;
+  }
+}
+
+class LocalDbList {
+  int id=0;
+  String data="";
+
+  LocalDbList(@required this.id,@required this.data);
+
+  LocalDbList.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    data = json['data'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['data'] = this.data;
+
+    return data;
+  }
+
+  LocalDbList.fromJsonDatabase(Map<String, dynamic> json) {
+    id = json['id'];
+    data = json['data'];
+  }
 }

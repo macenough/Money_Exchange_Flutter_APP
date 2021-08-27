@@ -27,6 +27,7 @@ class MoneyExchangeModel {
     }
     return data;
   }
+
 }
 
 class Rates {
