@@ -8,7 +8,7 @@ class ClientApi {
 
   Future<MoneyExchangeModel?> getSingleObjectData() async {
     final responseData = await _client.get(
-        Uri.parse("http://api.exchangeratesapi.io/v1/latest?access_key=181c9d1dfa6d053637fb430fcf28a586&format=1"));
+        Uri.parse("http://api.exchangeratesapi.io/v1/latest?access_key=YOUR-KEY&format=1"));
     if (responseData.statusCode == 200) {
       final data = jsonDecode(responseData.body);
       print(data);
